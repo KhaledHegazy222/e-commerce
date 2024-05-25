@@ -1,0 +1,35 @@
+*{
+  margin : 0;
+  padding:0;
+  box-sizing: border-box;
+}
+body{
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+#main{
+  flex:1;
+}
+
+.nav-item{
+  font-size: 1rem;
+  margin: 0 10px;
+  padding:0 10px;
+  border:1px solid transparent;
+  border-radius: 10px;
+  transition: 300ms;
+}
+
+.nav-item:not(.active):hover {
+  border: 1px solid #dbdbdb;
+  background-color: #dbdbdb;
+}
+
+.nav-item.active {
+  background-color: rgb(21, 9, 9);
+  
+  .nav-link{
+    color: white !important;
+  }
+}
