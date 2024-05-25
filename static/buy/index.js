@@ -61,7 +61,7 @@ function mapListToObj(headers, data) {
 
 function constructBookCard(book) {
   // Create the main card div using jQuery
-  const $card = $("<div>", { class: "card book-card", style: "width: 18rem; height:100%; border:1px solid red" });
+  const $card = $("<div>", { class: "card book-card", style: "width: 18rem;" });
 
   // Create and set up the card image
   const $img = $("<img>", {
