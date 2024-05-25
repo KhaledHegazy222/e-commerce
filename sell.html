@@ -5,35 +5,58 @@
   <!-- Required meta tags -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="icon" href="favicon.png" type="image/png">
 
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
     integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <link rel="stylesheet" href="static/main.css" />
-  <title>Document</title>
+  <link rel="stylesheet" href="static/main.css" />
+
+  <title>E-Commerce</title>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-  <script>
-    $(function () {
-      $("#header").load("components/navbar.html")
-      $("#footer-container").load("components/footer.html")
-    });
-  </script>
 </head>
 
 <body>
   <header id="header">
-
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" href="/">E-Commerce</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/sell.html">Sell Books</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/buy.html">Buy Books</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
   </header>
   <main id="main">
 
+
   </main>
-  <div id="footer-container">
+  <footer class="bg-light text-center text-lg-start">
 
-  </div>
+    <!-- Copyright -->
+    <div class="text-center p-2 bg-dark text-light">
+      © 2024 Copyright:
+      <a class="text-light" href="/">e-commerce.com</a>
+    </div>
+    <!-- Copyright -->
+  </footer>
 
 
-  <script defer src="static/main.js" />
+  <script defer src="static/main.js"></script>
 
   <!-- Optional JavaScript -->
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
