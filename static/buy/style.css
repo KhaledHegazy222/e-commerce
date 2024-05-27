@@ -5,6 +5,9 @@
   justify-content: center;
 }
 
+.books-container{
+  margin-top: 5rem;
+}
 .book-card{
-  margin:10px
+  margin:auto;
 }

@@ -12,6 +12,7 @@ body{
   --color-light: white;
   --color-dark:rgb(52, 58, 64);
   --color-primary:rgb(255, 193, 7);
+  --color-secondary:#effafc;
 }
 
 #main{

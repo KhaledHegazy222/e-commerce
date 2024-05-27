@@ -68,7 +68,7 @@ function constructBookCard(book) {
     class: "card-img-top",
     src: book.imageSrc,
     alt: "Card image cap",
-    style: "height:200px; object-fit: cover;"
+    style: "height:200px; object-fit: cover;",
   });
 
   // Create the card body div
@@ -78,7 +78,10 @@ function constructBookCard(book) {
   const $cardTitle = $("<h5>", { class: "card-title h5", text: book.title });
 
   // Create and set up the card text
-  const $cardText = $("<p>", { class: "card-text text-muted", text: book.description });
+  const $cardText = $("<p>", {
+    class: "card-text text-muted",
+    text: book.description,
+  });
 
   // Create and set up the card link/button
   const $cardButton = $("<a>", {
@@ -101,9 +104,19 @@ function renderBooks() {
     constructBookCard(book)
   );
   $("#main").empty();
-  const $cardContainer = $("<div>", { class: "d-flex align-items-stretch justify-content-center m-4 flex-wrap" })
-  $cardContainer.append(...booksDomElements)
-  const $title = $('<h2>',{'class':'h2 m-3 font-weight-bold text-center'}).text("Available Books")
-  const $description = $('<p>',{'class':'m-auto text-center text-muted w-50 m-3'}).text("Browse our extensive book collection and find your next great read. From thrillers to classics, non-fiction to children's stories, there's something for everyone. Start your literary adventure today!")
-  $("#main").append($title,$description,$cardContainer);
+  const $cardContainer = $("<div>", {
+    class: "d-flex justify-content-between gap-3 flex-wrap books-container",
+  });
+  $cardContainer.append(...booksDomElements);
+  const $title = $("<h2>", {
+    class: "h2 display-4 fw-normal text-center",
+    style:"margin: 1.5rem 0;"
+  }).text("Available Books");
+  const $description = $("<p>", {
+    class: "m-auto text-center text-muted fs-5",
+    style:"max-width:80%; margin: 1.5rem 0;"
+  }).text(
+    "Browse our extensive book collection and find your next great read. From thrillers to classics, non-fiction to children's stories, there's something for everyone. Start your literary adventure today!"
+  );
+  $("#main").append($title, $description, $cardContainer);
 }
