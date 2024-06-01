@@ -43,3 +43,10 @@ body{
     color: var(--color-dark) !important;
   }
 }
+
+
+.alert{
+  position: absolute; 
+  right:10px; 
+  top: calc(62px + 10px);
+}

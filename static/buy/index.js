@@ -5,6 +5,8 @@ const apiKey = "AIzaSyD5hFsGNCUMsGSiMvE7chyGayUJ3bqBHLQ";
 this.context = {};
 this.context.books = [];
 this.context.sellers = [];
+this.context.cart = []
+
 
 $(document).ready(async () => {
   booksPageDataPromise = fetchSheetPage(booksSheetName);
@@ -61,18 +63,17 @@ function mapListToObj(headers, data) {
 
 function constructBookCard(book) {
   // Create the main card div using jQuery
-  const $card = $("<div>", { class: "card book-card", style: "width: 18rem;" });
+  const $card = $("<div>", { class: "card book-card" });
 
   // Create and set up the card image
   const $img = $("<img>", {
     class: "card-img-top",
     src: book.imageSrc,
     alt: "Card image cap",
-    style: "height:200px; object-fit: cover;",
   });
 
   // Create the card body div
-  const $cardBody = $("<div>", { class: "card-body" });
+  const $cardBody = $("<div>", { class: "card-body d-flex flex-column" });
 
   // Create and set up the card title
   const $cardTitle = $("<h5>", { class: "card-title h5", text: book.title });
@@ -83,12 +84,24 @@ function constructBookCard(book) {
     text: book.description,
   });
 
-  // Create and set up the card link/button
-  const $cardButton = $("<a>", {
-    class: "btn btn-warning d-block",
-    href: book.link,
-    text: "Add To Cart",
-  });
+  const isAlreadyAddedToCart = isInCart(book.title)
+  let $cardButton;
+  if (isAlreadyAddedToCart) {
+    // Create and set up the card link/button
+    $cardButton = $("<a>", {
+      class: "btn btn-success d-block",
+      text: "Remove From Cart",
+    });
+    $cardButton.click( () => removeItemFromCart(book.title))  
+  }
+  else {
+    // Create and set up the card link/button
+    $cardButton = $("<a>", {
+      class: "btn btn-warning d-block",
+      text: "Add To Cart",
+    });
+    $cardButton.click( () => addItemToCart(book.title))  
+  }
 
   // Append elements to the card body
   $cardBody.append($cardTitle, $cardText, $cardButton);
@@ -105,18 +118,59 @@ function renderBooks() {
   );
   $("#main").empty();
   const $cardContainer = $("<div>", {
-    class: "d-flex justify-content-between gap-3 flex-wrap books-container",
+    class: "books-container d-flex justify-content-between gap-3 flex-wrap align-items-stretch",
   });
   $cardContainer.append(...booksDomElements);
   const $title = $("<h2>", {
-    class: "h2 display-4 fw-normal text-center",
-    style:"margin: 1.5rem 0;"
+    class: "page-title h2 display-4 fw-normal text-center",
   }).text("Available Books");
   const $description = $("<p>", {
-    class: "m-auto text-center text-muted fs-5",
-    style:"max-width:80%; margin: 1.5rem 0;"
+    class: "page-description m-auto text-center text-muted fs-5",
+    style:""
   }).text(
     "Browse our extensive book collection and find your next great read. From thrillers to classics, non-fiction to children's stories, there's something for everyone. Start your literary adventure today!"
   );
   $("#main").append($title, $description, $cardContainer);
+}
+
+
+function addItemToCart(bookTitle) {
+  const book = this.context.books.find((elem) => elem.title === bookTitle)
+  if (book === undefined) {
+    showAlert("Something went wrong", "error")
+    return;
+  }
+  this.context.cart.push(book)
+  renderBooks()
+  renderCart()
+}
+
+
+
+function removeItemFromCart(bookTitle) {
+  const bookIndex = this.context.cart.findIndex((elem) => elem.title === bookTitle)
+  if (bookIndex === -1) {
+    showAlert("Something went wrong", "error")
+    return;
+  }
+  this.context.cart.splice(bookIndex, 1)
+  renderBooks()
+  renderCart()
+}
+
+
+function isInCart(bookTitle) {
+  const book = this.context.cart.find((elem) => elem.title === bookTitle)
+  return book !== undefined;
+}
+
+function renderCart() {
+  const cart = this.context.cart;
+  if (cart.length !== 0) {
+    $(".cart-items").text(cart.length)
+    $(".cart").removeClass("d-none")
+  }
+  else {
+    $(".cart").addClass("d-none")
+  }
 }

@@ -1,13 +1,60 @@
-.spinner-container{
+.spinner-container {
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.books-container{
+.books-container {
   margin-top: 5rem;
+
+  .book-card {
+    width: 18rem;
+    margin: 10px auto;
+    flex: 1 1 auto;
+  }
+
+  .book-card img {
+    height: 200px;
+    object-fit: cover;
+  }
+
+  .card-body .btn {
+    margin-top: auto;
+  }
 }
-.book-card{
-  margin:auto;
+
+.page-title {
+  margin: 1.5rem 0;
+}
+
+.page-description {
+  max-width: 80%;
+  margin: 1.5rem 0;
+}
+
+.cart {
+  bottom: 20px;
+  right: 20px;
+  background-color: var(--color-primary);
+  height: 65px;
+  width: 65px;
+  display: grid;
+  place-items: center;
+  border-radius: 100%;
+  font-size: 25px;
+
+  .cart-items{
+    background-color: rgb(245, 51, 51);
+    font-size: 17px;
+    color:white;
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-content: center;
+    border-radius: 100%;
+    top:-5px;
+    right: -5px;
+    position: absolute;
+  }
 }
