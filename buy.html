@@ -51,10 +51,34 @@
       </div>
     </div>
   </main>
-  <button class="cart position-fixed d-none border-0">
-    <i class="bi bi-cart"></i>
-    <span class="cart-items"></span>
-  </button>
+  <div>
+
+    <button type="button" class="cart position-fixed d-none border-0" data-bs-toggle="modal"
+      data-bs-target="#checkoutModal">
+      <i class="bi bi-cart"></i>
+      <span class="cart-items"></span>
+    </button>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="checkoutModal" tabindex="-1" aria-labelledby="checkoutModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">My Cart</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            ...
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-warning">Buy Now</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <footer class="bg-light text-center text-lg-start">
 
     <!-- Copyright -->

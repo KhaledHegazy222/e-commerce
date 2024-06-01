@@ -166,11 +166,32 @@ function isInCart(bookTitle) {
 
 function renderCart() {
   const cart = this.context.cart;
+  const cartItemsList = cart.map((item) => {
+    const $itemText = $("<p>", { text: item.title,class:"p-0 m-0" })
+    const $removeBtn = $("<button>", {
+      class:"bg-danger border-0 text-light",
+      text: "x",
+      style:"width:20px; height:20px; border-radius: 100%; display:grid; place-items:center;font-size: 0.9rem"
+    })
+    $removeBtn.click(() => {
+      removeItemFromCart(item.title)
+    })
+    const $item = $("<li>", {
+      class: "d-flex justify-content-between align-items-center mb-2",
+    })
+    $item.append($itemText,$removeBtn)
+    return $item;
+  })
+  const $cartItemsList = $("<ul>")
+  $cartItemsList.append(...cartItemsList)
+
   if (cart.length !== 0) {
     $(".cart-items").text(cart.length)
     $(".cart").removeClass("d-none")
+    $("#checkoutModal .modal-body").html($cartItemsList)
   }
   else {
     $(".cart").addClass("d-none")
+    $("#checkoutModal .modal-body").html($cartItemsList)
   }
 }
