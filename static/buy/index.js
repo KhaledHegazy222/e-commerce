@@ -5,8 +5,7 @@ const apiKey = "AIzaSyD5hFsGNCUMsGSiMvE7chyGayUJ3bqBHLQ";
 this.context = {};
 this.context.books = [];
 this.context.sellers = [];
-this.context.cart = []
-
+this.context.cart = [];
 
 $(document).ready(async () => {
   booksPageDataPromise = fetchSheetPage(booksSheetName);
@@ -54,9 +53,11 @@ async function fetchSheetPage(sheetName) {
 function mapListToObj(headers, data) {
   return data.map((row) => {
     let obj = {};
-    headers.forEach((header, index) => {
-      obj[header] = row[index];
-    });
+    headers
+      .map((header) => header.toLowerCase().replace(" ", "_"))
+      .forEach((header, index) => {
+        obj[header] = row[index];
+      });
     return obj;
   });
 }
@@ -68,7 +69,7 @@ function constructBookCard(book) {
   // Create and set up the card image
   const $img = $("<img>", {
     class: "card-img-top",
-    src: book.imageSrc,
+    src: book.image,
     alt: "Card image cap",
   });
 
@@ -79,12 +80,18 @@ function constructBookCard(book) {
   const $cardTitle = $("<h5>", { class: "card-title h5", text: book.title });
 
   // Create and set up the card text
-  const $cardText = $("<p>", {
+  const $cardText = $("<div>", {
     class: "card-text text-muted",
-    text: book.description,
+    html: `
+      <p data-bs-toggle="tooltip" data-bs-placement="bottom" title="${
+        book.description
+      }">
+      ${getFirstNChar(book.description, 100)}
+      </p>
+    `,
   });
 
-  const isAlreadyAddedToCart = isInCart(book.title)
+  const isAlreadyAddedToCart = isInCart(book.title);
   let $cardButton;
   if (isAlreadyAddedToCart) {
     // Create and set up the card link/button
@@ -92,15 +99,14 @@ function constructBookCard(book) {
       class: "btn btn-success d-block",
       text: "Remove From Cart",
     });
-    $cardButton.click( () => removeItemFromCart(book.title))  
-  }
-  else {
+    $cardButton.click(() => removeItemFromCart(book.title));
+  } else {
     // Create and set up the card link/button
     $cardButton = $("<a>", {
       class: "btn btn-warning d-block",
       text: "Add To Cart",
     });
-    $cardButton.click( () => addItemToCart(book.title))  
+    $cardButton.click(() => addItemToCart(book.title));
   }
 
   // Append elements to the card body
@@ -118,7 +124,8 @@ function renderBooks() {
   );
   $("#main").empty();
   const $cardContainer = $("<div>", {
-    class: "books-container d-flex justify-content-between gap-3 flex-wrap align-items-stretch",
+    class:
+      "books-container d-flex justify-content-between gap-3 flex-wrap align-items-stretch",
   });
   $cardContainer.append(...booksDomElements);
   const $title = $("<h2>", {
@@ -126,72 +133,108 @@ function renderBooks() {
   }).text("Available Books");
   const $description = $("<p>", {
     class: "page-description m-auto text-center text-muted fs-5",
-    style:""
+    style: "",
   }).text(
     "Browse our extensive book collection and find your next great read. From thrillers to classics, non-fiction to children's stories, there's something for everyone. Start your literary adventure today!"
   );
   $("#main").append($title, $description, $cardContainer);
+  $('[data-bs-toggle="tooltip"]').tooltip();
 }
-
 
 function addItemToCart(bookTitle) {
-  const book = this.context.books.find((elem) => elem.title === bookTitle)
+  const book = this.context.books.find((elem) => elem.title === bookTitle);
   if (book === undefined) {
-    showAlert("Something went wrong", "error")
+    showAlert("Something went wrong", "error");
     return;
   }
-  this.context.cart.push(book)
-  renderBooks()
-  renderCart()
+  this.context.cart.push(book);
+  renderBooks();
+  renderCart();
 }
-
-
 
 function removeItemFromCart(bookTitle) {
-  const bookIndex = this.context.cart.findIndex((elem) => elem.title === bookTitle)
+  const bookIndex = this.context.cart.findIndex(
+    (elem) => elem.title === bookTitle
+  );
   if (bookIndex === -1) {
-    showAlert("Something went wrong", "error")
+    showAlert("Something went wrong", "error");
     return;
   }
-  this.context.cart.splice(bookIndex, 1)
-  renderBooks()
-  renderCart()
+  this.context.cart.splice(bookIndex, 1);
+  renderBooks();
+  renderCart();
 }
 
-
 function isInCart(bookTitle) {
-  const book = this.context.cart.find((elem) => elem.title === bookTitle)
+  const book = this.context.cart.find((elem) => elem.title === bookTitle);
   return book !== undefined;
 }
 
 function renderCart() {
   const cart = this.context.cart;
   const cartItemsList = cart.map((item) => {
-    const $itemText = $("<p>", { text: item.title,class:"p-0 m-0" })
+    const $itemImage = $("<img>", {
+      src: item.image,
+      style: "width:150px; height:100px; object-fit: cover;",
+      class: "rounded",
+    });
+    const $itemText = $("<div>", {
+      class: "p-2 m-0 d-flex flex-column",
+      style: "flex: 1; align-self: stretch;",
+      html: `
+      <h5 class='p-0 m-0 h5'>${item.title}</h5>
+      <p class='p-0 m-0 text-muted small' data-bs-toggle="tooltip" data-bs-placement="bottom" title="${
+        item.description
+      }">
+      ${getFirstNChar(item.description, 100)}
+      </p>
+      <p class='p-0 m-0 text-end mt-auto'>Cost: <span class='fw-bold'>${40} EGP</span></p>
+      `,
+    });
     const $removeBtn = $("<button>", {
-      class:"bg-danger border-0 text-light",
-      text: "x",
-      style:"width:20px; height:20px; border-radius: 100%; display:grid; place-items:center;font-size: 0.9rem"
-    })
+      class: "remove-btn border-0",
+      style: "font-size: 2rem",
+    });
+    $removeBtn.append($("<i class='bi bi-x'></i>"));
     $removeBtn.click(() => {
-      removeItemFromCart(item.title)
-    })
+      removeItemFromCart(item.title);
+    });
     const $item = $("<li>", {
-      class: "d-flex justify-content-between align-items-center mb-2",
-    })
-    $item.append($itemText,$removeBtn)
+      class:
+        "d-flex justify-content-between align-items-center my-3 gap-2 border rounded",
+    });
+    $item.append($itemImage, $itemText, $removeBtn);
     return $item;
-  })
-  const $cartItemsList = $("<ul>")
-  $cartItemsList.append(...cartItemsList)
+  });
+  const $cartItemsList = $("<ul>", { class: "m-0 p-0" });
+  $cartItemsList.append(...cartItemsList);
+  const $totalCost = $("#total-cost-content");
+  $totalCost.text(`${(Math.random() * 100 + 11).toFixed(2)} EGP`)
 
   if (cart.length !== 0) {
-    $(".cart-items").text(cart.length)
-    $(".cart").removeClass("d-none")
-    $("#checkoutModal .modal-body").html($cartItemsList)
+    $(".cart-items").text(cart.length);
+    $(".cart").removeClass("d-none");
+    $("#checkoutModal .modal-body").html($cartItemsList);
+  } else {
+    $(".cart").addClass("d-none");
+    $("#checkoutModal .modal-body").html($cartItemsList);
   }
-  else {
-    $(".cart").addClass("d-none")
-    $("#checkoutModal .modal-body").html($cartItemsList)
+  $('[data-bs-toggle="tooltip"]').tooltip();
+}
+
+function getFirstNChar(str, len) {
+  if (str.length > len) {
+    return str.slice(0, len) + "...";
   }
+  return str;
+}
+
+
+function sendWhatsApp() {
+  const phoneNumber = "+201282137600"
+  let textMessage = "Order:"
+  textMessage += this.context.cart.reduce((message, item) => message + `\n\t- ${item.title}`, "")
+  const whatsAppUrl = `https://wa.me/${phoneNumber}?text=${textMessage}`
+  window.open(whatsAppUrl,"_blank")
+  
 }
