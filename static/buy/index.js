@@ -8,27 +8,38 @@ this.context.sellers = [];
 this.context.cart = [];
 
 $(document).ready(async () => {
-  booksPageDataPromise = fetchSheetPage(booksSheetName);
-  sellersPageDataPromise = fetchSheetPage(sellersSheetName);
-  const [booksResponse, sellersResponse] = await Promise.all([
-    booksPageDataPromise,
-    sellersPageDataPromise,
-  ]);
-  let books = [];
-  let sellers = [];
-  if (booksResponse.status === "success") {
-    books = booksResponse.data.values;
-    const booksHeaders = books[0];
-    const booksData = books.slice(1);
-    this.context.books = mapListToObj(booksHeaders, booksData);
-    renderBooks();
+  let booksPageDataPromise;
+  let sellersPageDataPromise;
+
+  if (localStorage.getItem("books") && localStorage.getItem("sellers")) {
+    this.context.books = JSON.parse(localStorage.getItem("books"));
+    this.context.sellers = JSON.parse(localStorage.getItem("sellers"));
+  } else {
+    booksPageDataPromise = fetchSheetPage(booksSheetName);
+    sellersPageDataPromise = fetchSheetPage(sellersSheetName);
+    const [booksResponse, sellersResponse] = await Promise.all([
+      booksPageDataPromise,
+      sellersPageDataPromise,
+    ]);
+    let books = [];
+    let sellers = [];
+    if (booksResponse.status === "success") {
+      books = booksResponse.data.values;
+      const booksHeaders = books[0];
+      const booksData = books.slice(1);
+      this.context.books = mapListToObj(booksHeaders, booksData);
+      localStorage.setItem("books",JSON.stringify(this.context.books))
+    }
+    if (sellersResponse.status === "success") {
+      sellers = sellersResponse.data.values;
+      const sellersHeaders = sellers[0];
+      const sellersData = sellers.slice(1);
+      this.context.sellers = mapListToObj(sellersHeaders, sellersData);
+      localStorage.setItem("sellers",JSON.stringify(this.context.sellers))
+    }
   }
-  if (sellersResponse.status === "success") {
-    sellers = sellersResponse.data.values;
-    const sellersHeaders = sellers[0];
-    const sellersData = sellers.slice(1);
-    this.context.sellers = mapListToObj(sellersHeaders, sellersData);
-  }
+  assignBooksToAuthors();
+  renderBooks();
 });
 
 async function fetchSheetPage(sheetName) {
@@ -56,6 +67,7 @@ function mapListToObj(headers, data) {
     headers
       .map((header) => header.toLowerCase().replace(" ", "_"))
       .forEach((header, index) => {
+        obj.id = crypto.randomUUID()
         obj[header] = row[index];
       });
     return obj;
@@ -63,8 +75,9 @@ function mapListToObj(headers, data) {
 }
 
 function constructBookCard(book) {
+  
   // Create the main card div using jQuery
-  const $card = $("<div>", { class: "card book-card" });
+  const $card = $("<div>", { class: "card book-card position-relative" });
 
   // Create and set up the card image
   const $img = $("<img>", {
@@ -90,7 +103,7 @@ function constructBookCard(book) {
       </p>
     `,
   });
-
+  
   const isAlreadyAddedToCart = isInCart(book.title);
   let $cardButton;
   if (isAlreadyAddedToCart) {
@@ -101,6 +114,7 @@ function constructBookCard(book) {
     });
     $cardButton.click(() => removeItemFromCart(book.title));
   } else {
+    
     // Create and set up the card link/button
     $cardButton = $("<a>", {
       class: "btn btn-warning d-block",
@@ -115,7 +129,34 @@ function constructBookCard(book) {
   // Append image and card body to the main card div
   $card.append($img, $cardBody);
 
+  const haveAddedSellerToCart = isSellerInCart(book.seller_id)
+  const $discountLabel = $("<span>", {
+    html: 'Discount applied <i class="bi bi-info-circle"></i>',
+    class: "discount-label position-absolute",
+  })
+  $discountLabel.attr("data-bs-toggle","tooltip")
+  $discountLabel.attr("data-bs-placement","bottom")
+  $discountLabel.attr("title","No delivery fees will be applied on this book as it is from the same seller in your cart")
+  if (haveAddedSellerToCart && !isAlreadyAddedToCart) {
+    $card.append($discountLabel)
+  }
+
   return $card;
+}
+
+function assignBooksToAuthors() {
+  this.context.books = this.context.books.map(book => {
+    const bookSellerPhoneNumber = book.phone_number
+    seller = this.context.sellers.find((seller) => seller.phone_number == bookSellerPhoneNumber)
+    if (seller === undefined) {
+        book.seller_id = crypto.randomUUID()
+    }
+    else {
+      book.seller_id = seller.id
+    }
+    return book
+
+  })
 }
 
 function renderBooks() {
@@ -209,7 +250,7 @@ function renderCart() {
   const $cartItemsList = $("<ul>", { class: "m-0 p-0" });
   $cartItemsList.append(...cartItemsList);
   const $totalCost = $("#total-cost-content");
-  $totalCost.text(`${(Math.random() * 100 + 11).toFixed(2)} EGP`)
+  $totalCost.text(`${(Math.random() * 100 + 11).toFixed(2)} EGP`);
 
   if (cart.length !== 0) {
     $(".cart-items").text(cart.length);
@@ -229,12 +270,16 @@ function getFirstNChar(str, len) {
   return str;
 }
 
-
 function sendWhatsApp() {
-  const phoneNumber = "+201282137600"
-  let textMessage = "Order:"
-  textMessage += this.context.cart.reduce((message, item) => message + `\n\t- ${item.title}`, "")
-  const whatsAppUrl = `https://wa.me/${phoneNumber}?text=${textMessage}`
-  window.open(whatsAppUrl,"_blank")
-  
+  const phoneNumber = "+201282137600";
+  let textMessage = "Order:";
+  textMessage += this.context.cart.reduce(
+    (message, item) => message + `\r\n\t- ${item.title}`,
+    ""
+  );
+  const whatsAppUrl = `https://wa.me/${phoneNumber}?text=${textMessage}`;
+  window.open(whatsAppUrl, "_blank");
+}
+function isSellerInCart(seller_id) {
+    return this.context.cart.find(item=>item.seller_id === seller_id) !== undefined
 }
